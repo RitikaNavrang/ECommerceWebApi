@@ -1,6 +1,7 @@
 ﻿using BusinessLayer.Interface;
 using DataAccessLayer;
 using DataAccessLayer.Db;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,12 +18,12 @@ namespace ECommerceWebApi.Controllers
             _user= user;
         }
 
-        [HttpPost("Add-Supplier")]
+        [HttpPost("add-supplier")]
         public async Task<IActionResult> AddSupplier(UserDto obj)
         {
             try
             {
-                int role = 4;
+                int role = 2;
                  await _user.AddCustomerAsync(obj,role);
                 return Ok(obj);
             }
@@ -33,7 +34,7 @@ namespace ECommerceWebApi.Controllers
         }
 
 
-        [HttpPost("Add-Customer")]
+        [HttpPost("add-customer")]
         public async Task<IActionResult> AddCustomer(UserDto obj)
         {
             try
@@ -46,5 +47,27 @@ namespace ECommerceWebApi.Controllers
                 return BadRequest();
             }
         }
+
+        [HttpGet("get-user-by-id")]
+        public async Task<IActionResult> GetUser(int id)
+        {
+            var res = await _user.GetUserAsync(id);
+            return Ok(res);
+        }
+
+        [HttpGet("get-all-users")]
+        public async Task<IActionResult> GetAllUsers()
+        {
+            var res = await _user.GetAllUsersAsync();
+            return Ok(res);
+        }
+
+
+        //[HttpGet("get-all-suppliers")]
+        //public async Task<IActionResult> GetAllSuppliers()
+        //{
+        //    var supp = await _user.GetAllSuppliersAsync();
+        //    return Ok(supp);
+        //}
     }
 }

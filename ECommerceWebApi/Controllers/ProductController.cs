@@ -1,5 +1,7 @@
 ﻿using BusinessLayer.Interface;
 using DataAccessLayer;
+using DataAccessLayer.NewFolder;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
@@ -17,20 +19,46 @@ namespace ECommerceWebApi.Controllers
             _pro= pro;
         }
 
-
-        [HttpPost("Add-Product")]
-        public async Task<IActionResult> AddProduct(Product obj)
+        [HttpPost("add-product")]
+        public async Task<IActionResult> AddProductAsync(ProductDto obj)
         {
             try
             {
-                
-                await _pro.AddProductAsync(obj);
-                return Ok(obj);
+            var res =  _pro.AddProductAsync(obj);
+            return Ok(res);
+
             }
-            catch (Exception ex) { 
-            return BadRequest(ex.Message);
+            catch (Exception exe)
+            {
+
+                return BadRequest(exe.InnerException);
             }
         }
+       
 
+        [HttpDelete("delete-product")]
+        public async Task<IActionResult> RemoveProduct(int id)
+        {
+              await _pro.RemoveProductAsync(id);
+                return Ok();
+           
+        }
+
+        [HttpGet("getall-product")]
+        public async Task<IActionResult> GetAllProduct()
+        {
+            
+               var getall =  await _pro.GetAllProductAsync();
+                return Ok(getall);
+            
+           
+        }
+
+        [HttpPut("update-product")]
+        public async Task<IActionResult> UpdateProduct(ProductDto obj,int CategoryId)
+        {
+            var res = await _pro.UpdateProductAsync(obj,CategoryId);
+            return Ok(res); 
+        }
     }
 }

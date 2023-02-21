@@ -15,11 +15,12 @@ namespace DataAccessLayer
 
         public string UserName { get; set; }
 
-        public int Roleid { get; set; }
+        public int RoleId { get; set; }
 
-        [ForeignKey (nameof(Roleid))]
-        public Role RoleId { get; set; }
+        [ForeignKey (nameof(RoleId))]
+        public Role Roles { get; set; }
 
-        public ICollection<Product> Products { get; set;}
+        public ICollection<Product> ProCollect { get; set; }
+       
     }
 }

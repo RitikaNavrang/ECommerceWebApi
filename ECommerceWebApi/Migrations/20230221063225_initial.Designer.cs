@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ECommerceWebApi.Migrations
 {
     [DbContext(typeof(EcDbContext))]
-    [Migration("20230216132415_role")]
-    partial class role
+    [Migration("20230221063225_initial")]
+    partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -41,6 +41,49 @@ namespace ECommerceWebApi.Migrations
                     b.ToTable("categories");
                 });
 
+            modelBuilder.Entity("DataAccessLayer.OrderDetails", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("OrderTableId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderTableId");
+
+                    b.ToTable("OrderDetails");
+                });
+
+            modelBuilder.Entity("DataAccessLayer.OrderTable", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("TotalPrice")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("orders");
+                });
+
             modelBuilder.Entity("DataAccessLayer.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -48,6 +91,9 @@ namespace ECommerceWebApi.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -57,13 +103,15 @@ namespace ECommerceWebApi.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("UserId")
+                    b.Property<int>("Price")
                         .HasColumnType("int");
 
-                    b.Property<int>("price")
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
 
                     b.HasIndex("UserId");
 
@@ -95,7 +143,7 @@ namespace ECommerceWebApi.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"), 1L, 1);
 
-                    b.Property<int>("Roleid")
+                    b.Property<int>("RoleId")
                         .HasColumnType("int");
 
                     b.Property<string>("UserName")
@@ -104,32 +152,66 @@ namespace ECommerceWebApi.Migrations
 
                     b.HasKey("UserId");
 
-                    b.HasIndex("Roleid");
+                    b.HasIndex("RoleId");
 
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("DataAccessLayer.Product", b =>
+            modelBuilder.Entity("DataAccessLayer.OrderDetails", b =>
                 {
-                    b.HasOne("DataAccessLayer.User", null)
-                        .WithMany("Products")
-                        .HasForeignKey("UserId");
+                    b.HasOne("DataAccessLayer.OrderTable", null)
+                        .WithMany("OrderDetails")
+                        .HasForeignKey("OrderTableId");
                 });
 
-            modelBuilder.Entity("DataAccessLayer.User", b =>
+            modelBuilder.Entity("DataAccessLayer.Product", b =>
                 {
-                    b.HasOne("DataAccessLayer.Role", "RoleId")
-                        .WithMany()
-                        .HasForeignKey("Roleid")
+                    b.HasOne("DataAccessLayer.Category", "Category")
+                        .WithMany("collectproducts")
+                        .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("RoleId");
+                    b.HasOne("DataAccessLayer.User", "User")
+                        .WithMany("ProCollect")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("DataAccessLayer.User", b =>
                 {
-                    b.Navigation("Products");
+                    b.HasOne("DataAccessLayer.Role", "Roles")
+                        .WithMany("Users")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Roles");
+                });
+
+            modelBuilder.Entity("DataAccessLayer.Category", b =>
+                {
+                    b.Navigation("collectproducts");
+                });
+
+            modelBuilder.Entity("DataAccessLayer.OrderTable", b =>
+                {
+                    b.Navigation("OrderDetails");
+                });
+
+            modelBuilder.Entity("DataAccessLayer.Role", b =>
+                {
+                    b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("DataAccessLayer.User", b =>
+                {
+                    b.Navigation("ProCollect");
                 });
 #pragma warning restore 612, 618
         }

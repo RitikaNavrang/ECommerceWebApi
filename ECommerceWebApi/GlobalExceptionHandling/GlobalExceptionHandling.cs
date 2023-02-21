@@ -7,11 +7,11 @@ namespace ECommerceWebApi.GlobalExcptionHandling
     public class GlobalExceptionHandling
     {
         private readonly RequestDelegate _next;
-       
+
 
         public GlobalExceptionHandling(RequestDelegate next)
         {
-           
+
             _next = next;
         }
 
@@ -23,7 +23,7 @@ namespace ECommerceWebApi.GlobalExcptionHandling
             }
             catch (Exception ex)
             {
-                Log.Error(ex , ex.Message);
+                Log.Error(ex, ex.Message);
                 await HandleExceptionAsync(httpContext, ex);
             }
         }
@@ -51,8 +51,10 @@ namespace ECommerceWebApi.GlobalExcptionHandling
             await context.Response.WriteAsync(new ErrorDetails()
             {
                 StatusCode = status,//context.Response.StatusCode,
-                Message = exception.Message
+                Message = exception.Message,
+                InnerException = exception.Source,
             }.ToString());
         }
+
     }
 }

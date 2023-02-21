@@ -1,29 +1,33 @@
 using BusinessLayer.Implementation;
 using BusinessLayer.Interface;
 using DataAccessLayer.Db;
+using ECommerceWebApi;
 using ECommerceWebApi.GlobalExcptionHandling;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using System.Configuration;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddControllersWithViews();
+
 builder.Services.AddDbContext<EcDbContext>(options => options
-    .UseSqlServer(builder.Configuration.GetConnectionString("conn")
-    , dbOpt => dbOpt.MigrationsAssembly(Assembly.GetExecutingAssembly().GetName().Name))
-);
-builder.Services.AddTransient<IRole,RoleImp>();
-builder.Services.AddTransient<IProduct, ProductImp>();
-builder.Services.AddTransient<IUser, UserImp>();
-builder.Services.AddTransient<ICategory, CategoryImp>();
+       .UseSqlServer(builder.Configuration.GetConnectionString("conn")
+      , dbOpt => dbOpt.MigrationsAssembly(Assembly.GetExecutingAssembly().GetName().Name)));
+
+
+builder.Services.MethodJWT(builder.Configuration)
+                .Repo()
+                .Swager()
+                .AddNewtonJson();
 
 
 string Connectionstring = builder.Configuration.GetConnectionString("conn");
 string tableName = "Logs";
-
-
 
 // Serilog with database
 var _logger = new LoggerConfiguration()

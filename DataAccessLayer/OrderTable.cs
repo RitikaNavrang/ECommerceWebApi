@@ -7,13 +7,15 @@ using System.Threading.Tasks;
 
 namespace DataAccessLayer
 {
-   public class Order
+    public class OrderTable
     {
         [Key]
         public int Id { get; set; }
 
-        public string ShippingDetails { get; set; }
+        public int UserId { get; set; }
 
         public int TotalPrice { get; set; }
+
+        public ICollection<OrderDetails> OrderDetails { get; set; }
     }
 }
