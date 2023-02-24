@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DataAccessLayer
 {
-    public class Role
+    public class Role : Audit
     {
         [Key]
         public int RoleId { get; set; }

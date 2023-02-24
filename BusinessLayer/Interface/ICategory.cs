@@ -10,10 +10,10 @@ namespace BusinessLayer.Interface
 {
     public interface ICategory
     {
-        public Task<CategoryDto> AddCategoryAsync(CategoryDto obj);
+        public Task<Category> AddCategoryAsync(CategoryDto obj,int userid);
         public Task<IList<Category>> GetAllCategoryAsync();
         public Task<Category> DeleteCategoryAsync(int id);
-        public Task<Category> UpdateCategoryAsync(CategoryDto obj,int id);
+        public Task<Category> UpdateCategoryAsync(CategoryDto obj,int id,int userid);
 
 
     }

@@ -1,7 +1,9 @@
-﻿using BusinessLayer.Interface;
+﻿using AutoMapper;
+using BusinessLayer.Interface;
 using DataAccessLayer;
 using DataAccessLayer.Db;
 using DataAccessLayer.DTO;
+using DataAccessLayer.NewFolder;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -13,10 +15,12 @@ namespace BusinessLayer.Implementation
 {
     public class UserImp : IUser
     {
-        private readonly EcDbContext _context;
-        public UserImp(EcDbContext con) 
+        private readonly EcDbContext _db;
+        private readonly IMapper _mapper;
+        public UserImp(EcDbContext db,IMapper mapper) 
         {
-            _context = con;
+            _db = db;
+            _mapper = mapper;
         }
 
         
@@ -29,14 +33,14 @@ namespace BusinessLayer.Implementation
                 {
                     return;
                 }
-                User us = new User()
-                {
-                    UserId = obj.Id,
-                    UserName = obj.Name,
-                    RoleId = role1,
-                };
-                _context.Users.Add(us);
-                await _context.SaveChangesAsync();
+                
+                var map = _mapper.Map<User>(obj);
+                map.RoleId = role1;
+                map.CreatedBy = obj.Id;
+                map.CreatedAt = DateTime.Now;
+
+                _db.Users.Add(map);
+                await _db.SaveChangesAsync();
               
             }
             catch (Exception ex) { throw; }
@@ -46,7 +50,7 @@ namespace BusinessLayer.Implementation
         {
             try
             {
-                var us = await _context.Users.Where(a => a.UserId== id).FirstOrDefaultAsync();  
+                var us = await _db.Users.Where(a => a.UserId== id).FirstOrDefaultAsync();  
                 if (us == null)
                     throw new Exception("User not found!");
 
@@ -59,7 +63,7 @@ namespace BusinessLayer.Implementation
         {
             try
             {
-                var obj = _context.Roles.Include(x => x.Users).Select(x => new RoleDto()
+                var obj = _db.Roles.Include(x => x.Users).Select(x => new RoleDto()
                      {
                          RoleId = x.RoleId,
                          RoleName = x.RoleName,
@@ -79,31 +83,26 @@ namespace BusinessLayer.Implementation
             }
         }
 
-        //public async Task<List<UserDto>> GetAllSuppliersAsync()
-        //{
-        //    try
-        //    {
-        //        var obj = _context.Users.Where(a => a.RoleId == 2)
-        //        {
-        //            Id = x.Id,
-        //            Name = x.Name,
-        //            //UserRoles = x.Users.Select(u => new UserRoleDto()
-        //            //{
-        //            //    UserId = u.UserId,
-        //            //    UserName = u.UserName
-        //            //}).ToList(),
-        //        })
-        //             .ToList();
 
-        //        return obj;
-        //    }
-        //    catch (Exception)
-        //    {
-        //        throw;
-        //    }
-        //}
+        public async Task<List<UserRoleDto>> GetAllSuppliersAsync()
+        {
+            try
+            {
 
+                var obj= await _db.Users.Where(a => a.RoleId == 2).Select(x => new UserRoleDto()
+                {
+                    UserId = x.UserId,
+                    UserName= x.UserName,
+                }).ToListAsync();
 
+                return obj;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
 
+        
     }
 }

@@ -11,20 +11,21 @@ namespace ECommerceWebApi.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly IUser _user;
+        private readonly IUser _db;
 
-        public UserController(IUser user)
+        public UserController(IUser db)
         {
-            _user= user;
+            _db= db;
         }
 
         [HttpPost("add-supplier")]
+        [Authorize (Roles ="Admin")]
         public async Task<IActionResult> AddSupplier(UserDto obj)
         {
             try
             {
                 int role = 2;
-                 await _user.AddCustomerAsync(obj,role);
+                 await _db.AddCustomerAsync(obj,role);
                 return Ok(obj);
             }
             catch (Exception ex) 
@@ -35,12 +36,14 @@ namespace ECommerceWebApi.Controllers
 
 
         [HttpPost("add-customer")]
+        [Authorize(Roles = "Admin")]
+
         public async Task<IActionResult> AddCustomer(UserDto obj)
         {
             try
             {
                 int role = 3;
-                await _user.AddCustomerAsync(obj, role);
+                await _db.AddCustomerAsync(obj, role);
                 return Ok(obj);
             }
             catch (Exception ex) {
@@ -49,25 +52,31 @@ namespace ECommerceWebApi.Controllers
         }
 
         [HttpGet("get-user-by-id")]
+        [Authorize(Roles = "Admin")]
+
         public async Task<IActionResult> GetUser(int id)
         {
-            var res = await _user.GetUserAsync(id);
+            var res = await _db.GetUserAsync(id);
             return Ok(res);
         }
 
         [HttpGet("get-all-users")]
+        [Authorize (Roles ="Admin")]
+
         public async Task<IActionResult> GetAllUsers()
         {
-            var res = await _user.GetAllUsersAsync();
+            var res = await _db.GetAllUsersAsync();
             return Ok(res);
         }
 
 
-        //[HttpGet("get-all-suppliers")]
-        //public async Task<IActionResult> GetAllSuppliers()
-        //{
-        //    var supp = await _user.GetAllSuppliersAsync();
-        //    return Ok(supp);
-        //}
+        [HttpGet("get-all-suppliers")]
+        [Authorize(Roles = "Admin")]
+
+        public async Task<IActionResult> GetAllSuppliers()
+        {
+            var supp = await _db.GetAllSuppliersAsync();
+            return Ok(supp);
+        }
     }
 }

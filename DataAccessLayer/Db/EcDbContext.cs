@@ -21,7 +21,7 @@ public class EcDbContext : DbContext
     public DbSet<Product> products { get; set; }
     public DbSet<Category> categories { get; set; }
 
-    public DbSet<OrderTable> orders { get; set; }
+    public DbSet<OrderTable> OrderTable { get; set; }
 
 	public DbSet<OrderDetails> OrderDetails { get; set; }
 

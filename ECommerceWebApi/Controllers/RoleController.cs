@@ -3,36 +3,58 @@
 using BusinessLayer.Interface;
 using DataAccessLayer;
 using DataAccessLayer.Db;
+using DataAccessLayer.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace ECommerceWebApi.Controllers
 {
     public class RoleController : Controller
     {
-        private readonly IRole _con;
+        private readonly IRole _db;
 
-        public RoleController(IRole con)
+        public RoleController(IRole db)
         {
-            _con = con;
+            _db = db;
         }
 
         [HttpPost("add-role")]
-        public async Task<IActionResult> AddRole(Role obj)
+        [Authorize (Roles ="Admin")]
+        public async Task<IActionResult> AddRole(RoleRespDto obj)
         {
+            string Uid = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            int userId = Convert.ToInt32(Uid);
 
-            await _con.AddRoleAsync(obj);
-            return Ok(obj);
+             var res = await _db.AddRoleAsync(obj,userId);
+            return Ok(res);
 
         }
 
-        //[HttpGet("Get-Role-ById")]
-        //public async Task<IActionResult> GetRole(int id)
-        //{
-           
-        //    await _con.GetRoleAsync(id);
-        //    return Ok();
 
-        //}
+
+        [HttpGet("get-role-by-Id")]
+        [Authorize(Roles = "Admin")]
+
+        public async Task<IActionResult> GetRole(int id)
+        {
+
+            var res = await _db.GetRoleAsync(id);
+            return Ok(res);
+
+        }
+
+
+
+        [HttpGet("get-all-roles")]
+        [Authorize (Roles ="Admin")]
+        public async Task<IActionResult> GetallRole()
+        {
+
+            var res = await _db.GetAllRoleAsync();
+            return Ok(res);
+
+        }
+
     }
 }

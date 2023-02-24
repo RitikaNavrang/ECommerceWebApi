@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Server.IIS.Core;
+using System.Security.Claims;
 
 namespace ECommerceWebApi.Controllers
 {
@@ -12,21 +13,24 @@ namespace ECommerceWebApi.Controllers
     [ApiController]
     public class CategoryController : ControllerBase
     {
-        private readonly ICategory _cate;
+        private readonly ICategory _db;
 
-        public CategoryController(ICategory cate)
+        public CategoryController(ICategory db)
         {
-            _cate = cate;
+            _db = db;
         }
 
 
 
-        [HttpPost("add-category")]
+        [HttpPost("add-category"),Authorize(Roles ="Admin")]
         public async Task<IActionResult> AddCategory(CategoryDto obj)
         {
             try
             {
-                var res = await _cate.AddCategoryAsync(obj);
+                string Uid = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                int userId = Convert.ToInt32(Uid);
+
+                var res = await _db.AddCategoryAsync(obj,userId);
                 return Ok(res);
             }
             catch (Exception ex) 
@@ -37,28 +41,34 @@ namespace ECommerceWebApi.Controllers
 
 
         [HttpDelete("delete-category")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteCategory(int id)
         {
 
-            await _cate.DeleteCategoryAsync(id);
+            await _db.DeleteCategoryAsync(id);
             return Ok();
         }
 
 
 
-            [HttpGet("getall-category")]
+        [HttpGet("getall-category")]
+        [Authorize (Roles ="Admin,Supplier,Customer")]
         public async Task<IActionResult> GetAllCategory()
         {
            
-               var get =  await _cate.GetAllCategoryAsync();
+               var get =  await _db.GetAllCategoryAsync();
                 return Ok(get);
             
         }
 
         [HttpPut("update-category")]
-        public async Task<IActionResult> UpdateCate(CategoryDto obj,int id)
+        [Authorize (Roles ="Admin")]
+        public async Task<IActionResult> UpdateCate(CategoryDto obj,int id,int userid)
         {
-            var res = await _cate.UpdateCategoryAsync(obj,id);
+            string Uid = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            int userId = Convert.ToInt32(Uid);
+
+            var res = await _db.UpdateCategoryAsync(obj,id,userid);
             return Ok(res);
         }
     }

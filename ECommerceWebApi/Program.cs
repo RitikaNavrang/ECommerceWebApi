@@ -1,3 +1,4 @@
+using AutoMapper;
 using BusinessLayer.Implementation;
 using BusinessLayer.Interface;
 using DataAccessLayer.Db;
@@ -15,13 +16,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddDbContext<EcDbContext>(options => options
-       .UseSqlServer(builder.Configuration.GetConnectionString("conn")
-      , dbOpt => dbOpt.MigrationsAssembly(Assembly.GetExecutingAssembly().GetName().Name)));
+
 
 
 builder.Services.MethodJWT(builder.Configuration)
                 .Repo()
+                .Context(builder.Configuration)
                 .Swager()
                 .AddNewtonJson();
 

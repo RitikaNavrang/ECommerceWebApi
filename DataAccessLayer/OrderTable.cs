@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DataAccessLayer
 {
-    public class OrderTable
+    public class OrderTable : Audit
     {
         [Key]
         public int Id { get; set; }
@@ -17,5 +17,6 @@ namespace DataAccessLayer
         public int TotalPrice { get; set; }
 
         public ICollection<OrderDetails> OrderDetails { get; set; }
+
     }
 }

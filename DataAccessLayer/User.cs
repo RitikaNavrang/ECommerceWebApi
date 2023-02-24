@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DataAccessLayer
 {
-    public class User
+    public class User : Audit
     {
         [Key]
         public int UserId { get; set; }
@@ -16,11 +16,14 @@ namespace DataAccessLayer
         public string UserName { get; set; }
 
         public int RoleId { get; set; }
+        public ICollection<Product> ProCollect { get; set; }
+
+        #region Navigation
 
         [ForeignKey (nameof(RoleId))]
         public Role Roles { get; set; }
 
-        public ICollection<Product> ProCollect { get; set; }
-       
+        #endregion Navigation
+
     }
 }

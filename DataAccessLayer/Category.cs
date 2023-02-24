@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DataAccessLayer
 {
-    public class Category
+    public class Category : Audit
     {
       
        public int Id { get; set; }

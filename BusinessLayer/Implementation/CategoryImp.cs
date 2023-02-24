@@ -1,4 +1,5 @@
-﻿using BusinessLayer.Interface;
+﻿using AutoMapper;
+using BusinessLayer.Interface;
 using DataAccessLayer;
 using DataAccessLayer.Db;
 using DataAccessLayer.NewFolder;
@@ -10,26 +11,28 @@ namespace BusinessLayer.Implementation;
 
 public class CategoryImp : ICategory
 {
-    private readonly EcDbContext _context;
+    private readonly EcDbContext _db;
+    private readonly IMapper _mapper;
 
-    public CategoryImp(EcDbContext context)
+    public CategoryImp(EcDbContext db, IMapper mapper)
     {
-        _context = context;
+        _db = db;
+        _mapper = mapper;
     }
 
 
-    public async Task<CategoryDto> AddCategoryAsync(CategoryDto obj)
+    public async Task<Category> AddCategoryAsync(CategoryDto obj,int userid)
     {
         try
         {
 
-            Category res = new Category
-            {
-                Name = obj.CategoryName
-            };
-            _context.categories.AddAsync(res);
-            await _context.SaveChangesAsync();
-            return obj;
+            var map = _mapper.Map<Category>(obj);
+            map.CreatedAt= DateTime.Now;
+            map.CreatedBy= userid;
+
+            _db.categories.AddAsync(map);
+            await _db.SaveChangesAsync();
+            return map;
         }
         catch (Exception ex) 
         {
@@ -42,9 +45,9 @@ public class CategoryImp : ICategory
     {
        
 
-            var del = _context.categories.FirstOrDefault(x => x.Id == id);
-             _context.categories.Remove(del);
-            _context.SaveChanges();
+            var del = _db.categories.FirstOrDefault(x => x.Id == id);
+             _db.categories.Remove(del);
+            _db.SaveChanges();
             return del;
        
 
@@ -54,22 +57,24 @@ public class CategoryImp : ICategory
     public async Task<IList<Category>> GetAllCategoryAsync()
     {
         
-        var getall = _context.categories.Include(a => a.collectproducts).ToList();
+        var getall = _db.categories.Include(a => a.collectproducts).ToList();
             return getall;
         
     }
 
-    public async Task<Category> UpdateCategoryAsync(CategoryDto obj,int CategoryId)
+    public async Task<Category> UpdateCategoryAsync(CategoryDto obj,int CategoryId,int userid)
     {
         try
         {
-            Category res = new Category
-            {
-                Id = CategoryId,
-               Name = obj.CategoryName,
-            };
-            _context.categories.Update(res);
-            await _context.SaveChangesAsync();
+
+            
+            var res = _mapper.Map<Category>(obj);
+
+            res.ModifiedAt = DateTime.Now;
+            res.ModifiedBy = userid;
+
+            _db.categories.Update(res);
+            await _db.SaveChangesAsync();
             return res;
 
         }

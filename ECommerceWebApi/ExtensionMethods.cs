@@ -19,6 +19,7 @@ namespace ECommerceWebApi;
 
 public static class ExtensionMethods
 {
+    #region Swager
     public static IServiceCollection Swager(this IServiceCollection services)
     {
 
@@ -35,7 +36,9 @@ public static class ExtensionMethods
         });
         return services;
     }
+    #endregion Swager
 
+    #region MethodJWt
     public static IServiceCollection MethodJWT(this IServiceCollection services, IConfiguration configuration)
     {
         //?--------------------------JWT authentication ---------------------------------------------
@@ -56,18 +59,20 @@ public static class ExtensionMethods
         return (services);
 
     }
+    #endregion MethodJWt
 
+    #region Context
+    public static IServiceCollection Context(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddDbContext<EcDbContext>(options => options
+        .UseSqlServer(configuration.GetConnectionString("conn")
+       , dbOpt => dbOpt.MigrationsAssembly(Assembly.GetExecutingAssembly().GetName().Name)));
 
-    //public static IServiceCollection Context(this IServiceCollection services, IConfiguration configuration)
-    //{
-    //    services.AddDbContext<EcDbContext>(options => options
-    //    .UseSqlServer(configuration.GetConnectionString("conn")
-    //   , dbOpt => dbOpt.MigrationsAssembly(Assembly.GetExecutingAssembly().GetName().Name)));
+        return services;
+    }
+    #endregion Context
 
-    //    return services;
-    //}
-
-
+    #region Repo
     public static IServiceCollection Repo(this IServiceCollection services)
     {
         services.AddTransient<IRole, RoleImp>();
@@ -79,7 +84,7 @@ public static class ExtensionMethods
 
         return services;
     }
-
+    #endregion Repo
 
     #region NewtonSoftJson
 

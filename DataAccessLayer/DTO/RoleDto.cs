@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DataAccessLayer.DTO;
 
-public class RoleDto
+public class RoleDto 
 {
     
     public int RoleId { get; set; }

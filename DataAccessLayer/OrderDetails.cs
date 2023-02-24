@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Identity.Client;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -8,20 +9,22 @@ using System.Threading.Tasks;
 
 namespace DataAccessLayer
 {
-    public class OrderDetails
+    public class OrderDetails : Audit
     {
 
-        [Key]
+
         public int Id { get; set; }
 
-        //public int OrderId { get; set; }
+        public int OrderId { get; set; }
 
         public int ProductId { get; set; }
 
-        //[ForeignKey(nameof(OrderId))]
+        [ForeignKey(nameof(OrderId))]
 
-        //public OrderTable OrderTable { get; set; }
+        public OrderTable OrderTable { get; set; }
 
+        [ForeignKey(nameof(ProductId))]
 
+       public Product? Product { get; set; }
     }
 }

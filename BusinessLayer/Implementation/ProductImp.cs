@@ -1,4 +1,5 @@
-﻿using BusinessLayer.Interface;
+﻿using AutoMapper;
+using BusinessLayer.Interface;
 using DataAccessLayer;
 using DataAccessLayer.Db;
 using DataAccessLayer.NewFolder;
@@ -15,29 +16,30 @@ namespace BusinessLayer.Implementation
 {
     public class ProductImp : IProduct
     {
-        private readonly EcDbContext _con;
+        private readonly EcDbContext _db;
+        private readonly IMapper _mapper;
 
-        public ProductImp(EcDbContext con)
+        public ProductImp(EcDbContext db,IMapper mapper)
         {
-            _con = con;
+            _db = db;
+            _mapper = mapper;
         }
 
-       public async Task<Product> AddProductAsync(ProductDto obj)
+       public async Task<Product> AddProductAsync(ProductDto obj,int userid , string URL)
         {
             try
             {
-                Product res = new Product
-                {
-                    Id= obj.Id,
-                    Name = obj.Name,
-                    Description= obj.Description,
-                    UserId= obj.UserId,
-                    Price=obj.Price,
-                    CategoryId= obj.CategoryId,
-                };
-                await _con.products.AddAsync(res);
-                     _con.SaveChanges();
-                return res;
+                
+                var map = _mapper.Map<Product>(obj);
+                
+                map.CreatedAt= DateTime.Now;
+                map.CreatedBy= userid;
+                map.UserId= userid;
+                map.ImgUrl= URL;
+
+                await _db.products.AddAsync(map);
+                     _db.SaveChanges();
+                return map;
 
             }
             catch (Exception)
@@ -49,9 +51,9 @@ namespace BusinessLayer.Implementation
 
         public async Task<string> RemoveProductAsync(int id)
         {
-                var del= _con.products.FirstOrDefault(x => x.Id == id);
-                 _con.products.Remove(del);
-                await _con.SaveChangesAsync();
+                var del= _db.products.FirstOrDefault(x => x.Id == id);
+                 _db.products.Remove(del);
+                await _db.SaveChangesAsync();
             return ("successful");
            
         }
@@ -60,32 +62,51 @@ namespace BusinessLayer.Implementation
         public async Task <IList<Product>> GetAllProductAsync()
         {
            
-               var prolist = await _con.products.ToListAsync();
+               var prolist = await _db.products.ToListAsync();
                 return prolist;
             
         }
 
-        public async Task<Product> UpdateProductAsync(ProductDto obj,int id)
+        public async Task<Product> UpdateProductAsync(ProductDto obj,int userid)
         {
             try
             {
-                Product get = new Product
-                {
-                    Id= obj.Id,
-                    Name= obj.Name,
-                    Price= obj.Price,
-                    CategoryId = obj.CategoryId,
-                };
-                 _con.products.Update(get);
-                _con.SaveChangesAsync();
-                return get;
+                //Product get = new Product
+                //{
+                //    Id = obj.Id,
+                //    ProductName = obj.Name,
+                //    Price = obj.Price,
+                //    CategoryId = obj.CategoryId,
+                //};
+
+                var res = _mapper.Map<Product>(obj);
+                
+                //res.UserId= userid;
+                res.ModifiedAt = DateTime.Now;
+                res.ModifiedBy = userid;
+
+                 _db.products.Update(res);
+                await _db.SaveChangesAsync();
+                return res;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
             }
         }
 
-        
+        public async Task<string> GetImageById(int id)
+        {
+            try
+            {
+                var url = await  _db.products.Where(x=>x.Id == id).Select(x=>x.ImgUrl).FirstOrDefaultAsync();
+                return url;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
     }
 }

@@ -27,15 +27,21 @@ public class AuthImp : IAuth
     }
     public string CreateToken(int id)
     {
+        try
+        {
+
+      
         var role = _db.Users.Where(x=>x.UserId==id).Include(x=>x.Roles).FirstOrDefault();
 
         List<Claim> claims = new List<Claim>()
             {
                 new Claim(ClaimTypes.Name, role.UserName),
                 new Claim(ClaimTypes.Role, role.Roles.RoleName),
+                new Claim(ClaimTypes.NameIdentifier, role.UserId.ToString()),
 
             };
 
+        
         var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
             _configuration.GetSection("AppSettings:Token").Value));
 
@@ -51,6 +57,11 @@ public class AuthImp : IAuth
         var jwt = new JwtSecurityTokenHandler().WriteToken(token);
 
          return jwt;
+        }
+        catch (Exception)
+        {
 
+            throw;
+        }
     }
 }

@@ -19,24 +19,23 @@ namespace WebApiJWT.Controllers
     public class AuthController : Controller
     {
 
-        private readonly IAuth _auth;
+        private readonly IAuth _db;
 
-        public AuthController(IAuth auth)
+        public AuthController(IAuth db)
         {
-            _auth = auth;
+            _db = db;
 
         }
 
         [HttpGet("create-token")]
         public  IActionResult AddToken(int id) 
         {
-            try
-            { 
-               var token=  _auth.CreateToken(id);
+             
+               var token=  _db.CreateToken(id);
                 return Ok(token);
-            }
-            catch(Exception ex) { throw; }
         }
 
+
+       
     }
 }
