@@ -11,11 +11,12 @@ namespace BusinessLayer.Interface;
 
 public interface IProduct
 {
-    public Task<Product> AddProductAsync(ProductDto obj,int userid , string URL);
+    public Task<Product> AddProductAsync(ProductDto obj,int userid);
     public Task<string> RemoveProductAsync(int id);
     public Task<IList<Product>> GetAllProductAsync();
 
-    public Task<string> GetImageById (int id);
+    public Task<byte[]> Get(string imageName);
+
 
     public Task<Product> UpdateProductAsync(ProductDto obj,int userid);
 

@@ -1,4 +1,5 @@
 using AutoMapper;
+using Azure.Storage.Blobs;
 using BusinessLayer.Implementation;
 using BusinessLayer.Interface;
 using DataAccessLayer.Db;
@@ -12,6 +13,12 @@ using System.Reflection;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+
+builder.Services.AddScoped(_ => {
+    return new BlobServiceClient(builder.Configuration.GetConnectionString("AzureBlobStorage"));
+});
+
 
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddControllersWithViews();
